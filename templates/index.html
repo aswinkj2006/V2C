@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V2C - Voice to Code AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="light-theme">
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-microphone-alt"></i>
+            V2C
+        </div>
+        <div class="controls">
+            <select id="voiceLanguage">
+                <option value="auto">Auto-detect Language</option>
+                {% for code, name in voice_languages.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+            
+            <select id="programmingLanguage">
+                <option value="auto" selected>Auto Detect</option>
+                {% for code, name in programming_languages.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+            
+            
+            <button id="themeToggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <button id="blindModeToggle" onclick="toggleBlindMode()" title="Press Ctrl+Alt+B to toggle">
+                <i class="fas fa-eye-slash"></i> Blind Mode
+            </button>
+            
+            <button id="clearBtn" onclick="clearAll()">
+                <i class="fas fa-trash"></i> Clear All
+            </button>
+        </div>
+    </div>
+
+    <!-- Blind Mode Interface -->
+    <div id="blindModeInterface" class="blind-mode-interface hidden">
+        <div class="blind-mode-header">
+            <h2>V2C Blind Mode - Voice First Interface</h2>
+            <button onclick="toggleBlindMode()" class="btn btn-secondary">
+                <i class="fas fa-eye"></i> Exit Blind Mode
+            </button>
+        </div>
+        
+        <!-- Prompt Input Section -->
+        <div class="blind-prompt-section">
+            <div class="section-title">Step 1: Voice Input</div>
+            <div class="mic-controls">
+                <button id="blindMicToggle" class="mic-button" onclick="toggleBlindMic()">
+                    <i class="fas fa-microphone"></i> Mic OFF
+                </button>
+                <div class="mic-hint">Press SPACE or M to start recording your prompt</div>
+            </div>
+            <div class="prompt-display">
+                <label>Your Prompt:</label>
+                <div id="blindPromptText" class="prompt-text">Waiting for voice input...</div>
+            </div>
+        </div>
+
+        <!-- Confirmation Section -->
+        <div id="blindConfirmSection" class="blind-confirm-section hidden">
+            <div class="section-title">Step 2: Confirm Your Request</div>
+            <div class="confirmation-text">
+                <p>I heard: "<span id="confirmPromptText"></span>"</p>
+                <p>Do you want to proceed with this prompt or edit it?</p>
+            </div>
+            <div class="confirmation-buttons">
+                <button class="btn btn-success" onclick="proceedWithPrompt()">
+                    <i class="fas fa-check"></i> Proceed
+                </button>
+                <button class="btn btn-warning" onclick="editPrompt()">
+                    <i class="fas fa-edit"></i> Edit Prompt
+                </button>
+            </div>
+        </div>
+
+        <!-- Code Generation Section -->
+        <div id="blindCodeSection" class="blind-code-section hidden">
+            <div class="section-title">Step 3: Generated Code</div>
+            <div class="blind-code-display">
+                <div class="code-header">
+                    <span>Generated Code:</span>
+                    <button class="btn btn-sm btn-primary" onclick="readCodeLineByLine()">
+                        <i class="fas fa-volume-up"></i> Read Code
+                    </button>
+                </div>
+                <div id="blindCodeArea" class="blind-code-content"></div>
+            </div>
+            
+            <!-- Code Description -->
+            <div class="blind-description">
+                <div class="description-header">
+                    <span>Code Description:</span>
+                    <button class="btn btn-sm btn-info" onclick="readDescription()">
+                        <i class="fas fa-volume-up"></i> Read Description
+                    </button>
+                </div>
+                <div id="blindDescriptionText" class="description-content"></div>
+            </div>
+
+            <!-- Console section removed -->
+        </div>
+
+        <!-- Edit Section -->
+        <div id="blindEditSection" class="blind-edit-section hidden">
+            <div class="section-title">Step 4: Code Editing</div>
+            <div class="edit-controls">
+                <button id="blindEditMic" class="mic-button" onclick="startBlindEdit()">
+                    <i class="fas fa-microphone"></i> Voice Edit
+                </button>
+                <div class="edit-hint">Say your edit command (e.g., "edit line 5 add print statement")</div>
+            </div>
+            <div id="blindEditConfirm" class="edit-confirm hidden">
+                <p>Edit command: "<span id="editCommandText"></span>"</p>
+                <div class="confirmation-buttons">
+                    <button class="btn btn-success" onclick="executeBlindEdit()">
+                        <i class="fas fa-check"></i> Apply Edit
+                    </button>
+                    <button class="btn btn-warning" onclick="cancelBlindEdit()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="blind-actions">
+            <div class="section-title">Actions</div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showBlindEditSection()">
+                    <i class="fas fa-edit"></i> Edit Code
+                </button>
+                <button class="btn btn-success" onclick="downloadBlindCode()">
+                    <i class="fas fa-download"></i> Download Code
+                </button>
+                <button class="btn btn-secondary" onclick="startNewBlindPrompt()">
+                    <i class="fas fa-plus"></i> New Prompt
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Display -->
+        <div class="blind-status">
+            <div id="blindVoiceStatus">Ready - Press SPACE or M to start</div>
+            <div id="blindCurrentAction">Waiting for voice input</div>
+        </div>
+        
+        <!-- Voice Keywords Display -->
+        <div id="blindVoiceKeywords" class="blind-keywords">
+            <!-- Keywords will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="voice-section">
+                <div class="voice-controls">
+                    <button id="recordBtn" class="record-btn" onclick="toggleRecording()">
+                        🎤 Start Recording
+                    </button>
+                    <div style="font-size: 12px; color: #858585; text-align: center;">
+                        Click to start/stop voice recording
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-input">
+                <label for="transcript">Voice Transcript / Edit Text:</label>
+                <textarea id="transcript" class="transcript-area" placeholder="Your voice will be transcribed here, or type your requirements..."></textarea>
+                <button id="generateBtn" onclick="generateCode()" style="width: 100%; margin-top: 0.5rem;">
+                    Generate Code
+                </button>
+            </div>
+        </div>
+
+        <div class="code-editor-container">
+            <div class="editor-header">
+                <div class="editor-tabs" id="editorTabs">
+                    <div class="tab active" data-file="main.py">
+                        <span>main.py</span>
+                        <i class="fas fa-times tab-close" onclick="closeTab('main.py')"></i>
+                    </div>
+                    <button class="add-tab-btn" onclick="addNewTab()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <div class="editor-toolbar">
+                    <div class="toolbar-row">
+                        <div class="toolbar-group">
+                            <button class="btn btn-info" onclick="formatCode()">
+                                <i class="fas fa-code"></i> Format
+                            </button>
+                            <button class="btn btn-primary" onclick="showHistory()">
+                                <i class="fas fa-history"></i> History
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportProject()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-dark" onclick="showGitHub()">
+                                <i class="fab fa-github"></i> GitHub
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="editor-workspace">
+                <div class="code-editor">
+                    <div class="line-numbers" id="lineNumbers">1</div>
+                    <div class="code-content">
+                        <pre><code id="codeDisplay" class="language-python"></code></pre>
+                        <textarea id="codeArea" class="code-area" placeholder="Generated code will appear here..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="preview-panel hidden" id="previewPanel">
+                    <div class="preview-header">
+                        <h4>Live Preview</h4>
+                        <button onclick="togglePreview()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <iframe id="previewFrame" src="about:blank"></iframe>
+                </div>
+            </div>
+            
+            <div class="edit-panel" id="editPanel">
+                <div class="panel-header">
+                    <strong>Advanced Editing</strong>
+                    <button onclick="toggleEditPanel()" class="panel-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                
+                <div class="panel-content">
+                    <div class="edit-section">
+                        <label>Line Range:</label>
+                        <div class="input-group">
+                            <input type="text" id="lineRange" class="line-input" placeholder="e.g., 5-8">
+                            <button onclick="highlightLines()">
+                                <i class="fas fa-highlighter"></i> Highlight
+                            </button>
+                            <button onclick="clearHighlight()">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="edit-section">
+                        <label>Voice Command:</label>
+                        <div class="voice-edit-controls">
+                            <button id="voiceEditBtn" onclick="startVoiceEdit()">
+                                <i class="fas fa-microphone"></i> Voice Edit
+                            </button>
+                            <span class="voice-hint">Say: "Edit line 5 to 10, change variable name to counter"</span>
+                        </div>
+                    </div>
+                    
+                    <div class="edit-section">
+                        <label>Modification Description:</label>
+                        <textarea id="modificationText" class="modification-area" placeholder="Describe what changes you want to make to the highlighted lines..."></textarea>
+                        <button onclick="modifyCode()" class="apply-btn">
+                            <i class="fas fa-check"></i> Apply Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-bar" id="statusBar">
+                <div class="status-left">
+                    <span id="statusText">Ready - V2C Voice to Code Assistant</span>
+                </div>
+                <div class="status-right">
+                    <span id="lineInfo">Line 1, Column 1</span>
+                    <span id="languageInfo">Python</span>
+                    <span id="projectInfo">No Project</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="githubModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>GitHub Integration</h3>
+                    <button onclick="closeModal('githubModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Authentication Section -->
+                    <div id="githubAuth">
+                        <div class="form-group">
+                            <label>GitHub Personal Access Token:</label>
+                            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                            <small>Need a token? <a href="https://github.com/settings/tokens" target="_blank">Create one here</a></small>
+                        </div>
+                        <button type="button" onclick="authenticateGitHub()" class="btn btn-primary">
+                            <i class="fab fa-github"></i> Authenticate
+                        </button>
+                    </div>
+                    
+                    <!-- Repository Options Section -->
+                    <div id="githubRepoOptions" style="display: none;">
+                        <div class="form-group">
+                            <label>Repository Name:</label>
+                            <input type="text" id="repoName" placeholder="my-v2c-project">
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea id="repoDescription" placeholder="Project generated with V2C Voice-to-Code"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="isPrivate"> Private Repository
+                            </label>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" onclick="createNewRepo()" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Create New Repository
+                            </button>
+                            <button type="button" onclick="resetGitHubAuth()" class="btn btn-secondary">
+                                <i class="fas fa-sign-out-alt"></i> Use Different Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

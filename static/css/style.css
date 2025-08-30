@@ -1,0 +1,875 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Dark Theme Variables */
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d30;
+    --bg-tertiary: #252526;
+    --bg-accent: #3c3c3c;
+    --text-primary: #d4d4d4;
+    --text-secondary: #858585;
+    --border-color: #3e3e42;
+    --accent-color: #007acc;
+    --success-color: #51cf66;
+    --error-color: #ff6b6b;
+    --warning-color: #ffd43b;
+}
+
+body.light-theme {
+    /* Light Theme Variables */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --bg-accent: #dee2e6;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #ced4da;
+    --accent-color: #0066cc;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+/* Button and UI spacing improvements */
+.btn, button {
+    margin: 4px 6px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    margin-bottom: 8px;
+}
+
+.toolbar-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.editor-toolbar {
+    margin-top: 8px;
+    background: var(--bg-secondary);
+    margin-bottom: 0;
+}
+
+/* Tab styling improvements */
+.file-tabs {
+    display: flex;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 8px;
+    margin-bottom: 8px;
+}
+
+.tab {
+    padding: 8px 16px;
+    margin: 4px 2px;
+    background: var(--bg-accent);
+    border: 1px solid var(--border-color);
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab.active {
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--bg-primary);
+}
+
+/* Line numbers fix */
+.line-numbers {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-right: 1px solid var(--border-color);
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    min-width: 50px;
+    text-align: right;
+    user-select: none;
+    white-space: pre;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.header {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+select, button, input {
+    background: var(--bg-accent);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+button {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: var(--bg-secondary);
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Blind Mode Styles */
+.blind-mode-interface {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-primary);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.blind-mode-interface.hidden {
+    display: none;
+}
+
+.blind-mode-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.blind-mode-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.voice-status {
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 2px solid var(--accent-color);
+}
+
+.blind-instructions {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.blind-instructions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.blind-instructions li {
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.blind-output {
+    flex: 1;
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    overflow-y: auto;
+}
+
+.main-container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 80px);
+}
+
+.left-panel {
+    width: 400px;
+    background: var(--bg-tertiary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.voice-section {
+    padding: 1rem;
+    border-bottom: 1px solid #3e3e42;
+}
+
+.voice-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.record-btn {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.record-btn:hover {
+    background: #1177bb;
+}
+
+.record-btn.recording {
+    background: #dc3545;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.text-input {
+    flex: 1;
+    padding: 1rem;
+}
+
+.transcript-area {
+    width: 100%;
+    height: 150px;
+    background: #1e1e1e;
+    border: 1px solid #5a5a5a;
+    color: #d4d4d4;
+    padding: 0.5rem;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: 'Courier New', monospace;
+}
+
+.code-editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+}
+
+.editor-header {
+    background: #2d2d30;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.editor-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tab {
+    background: #3c3c3c;
+    padding: 0.5rem 1rem;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+}
+
+.tab.active {
+    background: #1e1e1e;
+}
+
+.code-editor {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50px;
+    background: #2d2d30;
+    color: #858585;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 1rem 0.5rem;
+    user-select: none;
+    border-right: 1px solid #3e3e42;
+}
+
+.code-content {
+    margin-left: 50px;
+    height: 100%;
+    overflow: auto;
+}
+
+.code-area {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: #d4d4d4;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 1rem;
+    resize: none;
+    outline: none;
+}
+
+.highlighted-line {
+    background-color: #264f78 !important;
+}
+
+.status-bar {
+    background: #007acc;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 12px;
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007acc;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.edit-panel {
+    background: #2d2d30;
+    padding: 1rem;
+    border-top: 1px solid #3e3e42;
+    display: none;
+}
+
+.edit-panel.show {
+    display: block;
+}
+
+.line-input {
+    width: 100px;
+    margin-right: 0.5rem;
+}
+
+.modification-area {
+    width: 100%;
+    height: 80px;
+    margin: 0.5rem 0;
+}
+
+.error-message {
+    color: #ff6b6b;
+    background: #2d1b1b;
+    border: 1px solid #5a2d2d;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+.success-message {
+    color: #51cf66;
+    background: #1b2d1b;
+    border: 1px solid #2d5a2d;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+pre[class*="language-"] {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+code[class*="language-"] {
+    background: transparent !important;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-body {
+    padding: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-accent);
+    color: var(--text-primary);
+}
+
+.form-group textarea {
+    height: 80px;
+    resize: vertical;
+}
+
+.console-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.clear-btn, .speaker-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover, .speaker-btn:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+.history-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.history-item {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.history-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.history-item.current {
+    background: var(--accent-color);
+    color: white;
+}
+
+.history-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.history-date {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.history-preview {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.code-description {
+    background: var(--bg-tertiary);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    border-left: 4px solid var(--accent-color);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.execution-output {
+    background: var(--bg-primary);
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    white-space: pre-wrap;
+}
+
+.mic-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.mic-button {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: 2px solid var(--accent-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mic-button.active {
+    background: var(--accent-color);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.mic-hint {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Enhanced Blind Mode Styles */
+.blind-mode-interface {
+    padding: 2rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+.blind-mode-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+    border-left: 4px solid var(--accent-color);
+    padding-left: 1rem;
+}
+
+.blind-prompt-section, .blind-confirm-section, .blind-code-section, 
+.blind-edit-section, .blind-actions {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.prompt-display {
+    margin-top: 1rem;
+}
+
+.prompt-display label {
+    font-weight: bold;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.prompt-text {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1rem;
+    min-height: 60px;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.confirmation-text {
+    background: var(--bg-tertiary);
+    border-left: 4px solid var(--warning-color);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.confirmation-buttons, .action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.blind-code-display, .blind-description, .blind-console {
+    margin-bottom: 1.5rem;
+}
+
+.code-header, .description-header, .console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.blind-code-content, .description-content, .console-content {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+.console-content {
+    background: #1a1a1a;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+}
+
+.edit-controls {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.edit-hint {
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.edit-confirm {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--warning-color);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.blind-status {
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.blind-status div {
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.blind-keywords {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 4px solid #007acc;
+}
+
+.blind-keywords h4 {
+    color: #007acc;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.blind-keywords ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.blind-keywords li {
+    margin: 8px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #333;
+    font-size: 12px;
+}
+
+.blind-keywords li:last-child {
+    border-bottom: none;
+}
+
+.blind-keywords strong {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Responsive design for blind mode */
+@media (max-width: 768px) {
+    .blind-mode-interface {
+        padding: 1rem;
+    }
+    
+    .confirmation-buttons, .action-buttons {
+        flex-direction: column;
+    }
+    
+    .blind-status {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin-top: 1rem;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.text-success {
+    color: var(--success-color);
+}
+
+.text-error {
+    color: var(--error-color);
+}
+
+.text-warning {
+    color: var(--warning-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+    
+    .left-panel {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .header {
+        padding: 0.5rem;
+    }
+    
+    .editor-workspace {
+        flex-direction: column;
+    }
+    
+    .preview-panel {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .toolbar-group {
+        flex-wrap: wrap;
+    }
+}

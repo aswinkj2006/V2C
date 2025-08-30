@@ -1,0 +1,11 @@
+Flask==2.3.3
+google-generativeai==0.3.2
+SpeechRecognition==3.10.0
+googletrans==4.0.0rc1
+pyaudio==0.2.11
+Werkzeug==3.1.0
+python-dotenv==1.1.1
+requests==2.31.0
+PyGithub==1.59.1
+pyttsx3==2.90
+zipfile36==0.1.3
