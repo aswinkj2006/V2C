@@ -160,6 +160,6 @@ Navigate to `http://localhost:5000`
 
 For issues, feature requests, or contributions, please refer to the project documentation or contact the development team.
 
----
+-----
 
 **V2C - Voice to Code AI Assistant** - Transforming voice into code with AI-powered assistance.
